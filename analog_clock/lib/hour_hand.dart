@@ -1,21 +1,9 @@
-// Copyright 2019 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
-
 import 'hand.dart';
 import 'dart:math' as math;
 
-/// A clock hand that is built out of the child of a [Container].
-///
-/// This hand does not scale according to the clock's size.
-/// This hand is used as the hour hand in our analog clock, and demonstrates
-/// building a hand using existing Flutter widgets.
 class HourHand extends Hand {
-  /// Create a const clock [Hand].
-  ///
-  /// All of the parameters are required and must not be null.
+
   const HourHand({
     @required Color color,
     @required double size,
@@ -29,7 +17,6 @@ class HourHand extends Hand {
           angleRadians: angleRadians,
         );
 
-  /// The child widget used as the clock hand and rotated by [angleRadians].
   final Widget child;
 
   @override
@@ -38,7 +25,7 @@ class HourHand extends Hand {
     return Center(
       child: SizedBox.expand(
         child: CustomPaint(
-          painter: HourHandCustomPainter(hours: now.hour, minutes: now.minute),
+          painter: HourHandCustomPainter(hours: now.hour, minutes: now.minute,colore: color),
         ),
       ),
     );
@@ -47,24 +34,21 @@ class HourHand extends Hand {
 
 class HourHandCustomPainter extends CustomPainter {
   final Paint hourHandPaint;
+  final Color colore;
   int hours;
   int minutes;
 
-  HourHandCustomPainter({this.hours, this.minutes})
+  HourHandCustomPainter({this.hours, this.minutes,this.colore})
       : hourHandPaint = new Paint() {
-    hourHandPaint.color = Colors.black87;
+    hourHandPaint.color = colore;
     hourHandPaint.style = PaintingStyle.fill;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
     final radius = size.width / 6;
-    // To draw hour hand
     canvas.save();
-
     canvas.translate(radius, radius);
-
-    //checks if hour is greater than 12 before calculating rotation
     canvas.rotate(this.hours >= 12
         ? 2 * math.pi * ((this.hours - 12) / 12 + (this.minutes / 720))
         : 2 * math.pi * ((this.hours / 12) + (this.minutes / 720)));
@@ -73,17 +57,12 @@ class HourHandCustomPainter extends CustomPainter {
 
     path.moveTo(-1.0, -radius + radius / 4);
     path.lineTo(-5.0, -radius + radius / 2);
-
-    //speedometer timer analog clock like
-    // path.lineTo(-2.0, 0.0);
-    // path.lineTo(2.0, 0.0);
-    path.lineTo(5.0, -radius + radius / 2);
+    path.lineTo(5.0, -radius + radius / 2);   //speedometer timer analog clock like
     path.lineTo(1.0, -radius + radius / 4);
     path.close();
 
     canvas.drawPath(path, hourHandPaint);
-    canvas.drawShadow(path, Colors.black, 2.0, false);
-
+    canvas.drawShadow(path, Colors.white, 4.0, false);
     canvas.restore();
   }
 

@@ -1,33 +1,21 @@
-// Copyright 2019 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_clock_helper/model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:ui';
 import 'package:vector_math/vector_math_64.dart' show radians;
-
-// dart file for clock hands...
 import 'package:analog_clock/hour_hand.dart';
 import 'package:analog_clock/minute_hand.dart';
 import 'package:analog_clock/seconds_dart.dart';
 import 'clock_dial_painter.dart';
 
-/// Total distance traveled by a second or a minute hand, each second or minute,
-/// respectively.
-final radiansPerTick = radians(360 / 60);
 
-/// Total distance traveled by an hour hand, each hour, in radians.
+final radiansPerTick = radians(360 / 60);
 final radiansPerHour = radians(360 / 12);
 
-/// A basic analog clock.
-///
-/// You can do better than this!
 class AnalogClock extends StatefulWidget {
   const AnalogClock(this.model);
-
   final ClockModel model;
 
   @override
@@ -46,7 +34,7 @@ class _AnalogClockState extends State<AnalogClock> {
   void initState() {
     super.initState();
 
-    //orientation control in landscape mode only...
+//orientation control in landscape mode only...
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
@@ -96,41 +84,48 @@ class _AnalogClockState extends State<AnalogClock> {
   }
 
   @override
-  Widget build(BuildContext context) { 
-    // There are many ways to apply themes to your clock. Some are:
-    //  - Inherit the parent Theme (see ClockCustomizer in the
-    //    flutter_clock_helper package).
-    //  - Override the Theme.of(context).colorScheme.
-    //  - Create your own [ThemeData], demonstrated in [AnalogClock].
-    //  - Create a map of [Color]s to custom keys, demonstrated in
-    //    [DigitalClock].
-    final customTheme = Theme.of(context).brightness == Brightness.light
-        ? Theme.of(context).copyWith(
-            // Hour hand.
-            primaryColor: Color(0xFF4285F4),
-            // Minute hand.
-            highlightColor: Color(0xFF8AB4F8),
-            // Second hand.
-            accentColor: Color(0xFF669DF6),
-            backgroundColor: Color(0xFFD2E3FC),
-          )
+  Widget build(BuildContext context) {
+    final customTheme = Theme.of(context).brightness == Brightness.dark
+        ? Theme.of(context)
+            .copyWith(accentColor: Colors.black, backgroundColor: Colors.white)
         : Theme.of(context).copyWith(
-            primaryColor: Color(0xFFD2E3FC),
-            highlightColor: Color(0xFF4285F4),
-            accentColor: Color(0xFF8AB4F8),
-            backgroundColor: Color(0xFF3C4043),
+            accentColor: Colors.white,
+            backgroundColor: Colors.black,
           );
 
     final time = DateFormat.Hms().format(DateTime.now());
     final weatherInfo = DefaultTextStyle(
-      style: TextStyle(color: customTheme.primaryColor),
+      style: TextStyle(color: customTheme.accentColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_temperature),
-          Text(_temperatureRange),
-          Text(_condition),
-          Text(_location),
+          Text(
+            _temperature,
+            style: TextStyle(fontSize: 40.0, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            _condition,
+            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+          ),
+
+          // Text(_location),
+        ],
+      ),
+    );
+
+    final locationInfo = DefaultTextStyle(
+      style: TextStyle(color: customTheme.accentColor),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _location,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              fontSize: 22.0
+            ),
+          ),
         ],
       ),
     );
@@ -140,72 +135,116 @@ class _AnalogClockState extends State<AnalogClock> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("images/afternoon.jpg"),
-            fit: BoxFit.fitWidth
-          )
-        ),
-        // color: customTheme.backgroundColor,
-        //need to shift the stack a little so that we can get the idea of the clock rims..
+            image: DecorationImage(
+                image: AssetImage(
+                    "images/night.jpg"), //can change acc to location and time.
+                fit: BoxFit.fill)),
+
+//clock background
+
         child: Stack(
           children: [
-            //Dialer for seconds
-            new Container(
-              width: double.infinity,
-              height: double.infinity,
-              // padding: const EdgeInsets.all(10.0),
-              child: new CustomPaint(
-                painter: new ClockDialPainter(clockText: "Alert"),
+            
+//Weather conditions
+
+            Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                image: DecorationImage(image: AssetImage("images/rain.gif")),
               ),
             ),
-            // Example of a hand drawn with [CustomPainter].
 
-            // SecondHand
-            SecondsHand(
-              color: customTheme.accentColor,
-              thickness: 4,
-              size: 1,
-              angleRadians: _now.second * radiansPerTick,
+//Clock  background
+
+            Container(
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: customTheme.backgroundColor),
+              height: 220,
+              width: 220,
             ),
 
-            // MinuteHand
-            MinuteHand(
-              color: customTheme.highlightColor,
-              thickness: 16,
-              size: 0.9,
-              angleRadians: _now.minute * radiansPerTick,
+//Dailers of the clock
+
+            new Container(
+              padding: EdgeInsets.only(top: 9.0, left: 8.0),
+              width: double.infinity,
+              height: double.infinity,
+              child: new CustomPaint(
+                painter: new ClockDialPainter(
+                  clockText: "Alert",
+                  colore: customTheme.accentColor,
+                ),
+              ),
             ),
 
-            // Example of a hand drawn with [Container].
+// SecondHand
 
-            // HourHand
-            HourHand(
-              color: Colors.transparent,
-              size: 0.5,
-              angleRadians: _now.hour * radiansPerHour +
-                  (_now.minute / 60) * radiansPerHour,
-              child: Transform.translate(
-                offset: Offset(0.0, -60.0),
-                child: Container(
-                  width: 32,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: customTheme.primaryColor,
+            Container(
+              padding: EdgeInsets.only(top: 8.0, left: 8.0),
+              child: SecondsHand(
+                color: Colors.red,
+                thickness: 4,
+                size: 1,
+                angleRadians: _now.second * radiansPerTick,
+              ),
+            ),
+
+// MinuteHand
+
+            Container(
+              padding: EdgeInsets.only(top: 8.0, left: 8.0),
+              child: MinuteHand(
+                color: customTheme.accentColor,
+                thickness: 16,
+                size: 0.9,
+                angleRadians: _now.minute * radiansPerTick,
+              ),
+            ),
+
+// HourHand
+
+            Container(
+              padding: EdgeInsets.only(top: 8.0, left: 8.0),
+              child: HourHand(
+                color: customTheme.accentColor,
+                size: 0.5,
+                angleRadians: _now.hour * radiansPerHour +
+                    (_now.minute / 60) * radiansPerHour,
+                child: Transform.translate(
+                  offset: Offset(0.0, -60.0),
+                  child: Container(
+                    width: 32,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: customTheme.primaryColor,
+                    ),
                   ),
                 ),
               ),
             ),
 
+//weather info
 
-            // Positioned(
-            //   left: 0,
-            //   bottom: 0,
-            //   child: Padding(
-            //     padding: const EdgeInsets.all(8),
-            //     child: weatherInfo,
-            //   ),
-            // ),
+            Positioned(
+              right: 0,
+              top: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: weatherInfo,
+              ),
+            ),
 
+// location info
+
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: locationInfo,
+              ),
+            ),
 
           ],
         ),

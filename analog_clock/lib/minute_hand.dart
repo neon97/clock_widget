@@ -1,22 +1,8 @@
-// Copyright 2019 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-
 import 'hand.dart';
 
-/// A clock hand that is drawn with [CustomPainter]
-///
-/// The hand's length scales based on the clock's size.
-/// This hand is used to build the second and minute hands, and demonstrates
-/// building a custom hand.
 class MinuteHand extends Hand {
-  /// Create a const clock [Hand].
-  ///
-  /// All of the parameters are required and must not be null.
   const MinuteHand({
     @required Color color,
     @required this.thickness,
@@ -32,7 +18,6 @@ class MinuteHand extends Hand {
           angleRadians: angleRadians,
         );
 
-  /// How thick the hand should be drawn, in logical pixels.
   final double thickness;
 
   @override
@@ -42,47 +27,40 @@ class MinuteHand extends Hand {
       child: SizedBox.expand(
         child: CustomPaint(
             painter: MinuteHandCustomPainter(
-                minutes: now.minute, seconds: now.second)),
+                minutes: now.minute, seconds: now.second,colore: color)),
       ),
     );
   }
 }
 
-/// [CustomPainter] that draws a clock hand.
 class MinuteHandCustomPainter extends CustomPainter {
+  final Color colore;
   final Paint minuteHandPaint;
   int minutes;
   int seconds;
 
-  MinuteHandCustomPainter({this.minutes, this.seconds})
+  MinuteHandCustomPainter({this.minutes, this.seconds,this.colore})
       : minuteHandPaint = new Paint() {
-    minuteHandPaint.color = const Color(0xFF333333);
+    minuteHandPaint.color = colore;
     minuteHandPaint.style = PaintingStyle.fill;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final radius = size.width / 6;
+    final radius = size.width /6;
     canvas.save();
-
     canvas.translate(radius, radius);
-
     canvas.rotate(2 * math.pi * ((this.minutes + (this.seconds / 60)) / 60));
 
     Path path = new Path();
     path.moveTo(-1.5, -radius - 10.0);
     path.lineTo(-5.0, -radius / 1.8);
-
-    //a new analog clock can be made by this style
-    // path.lineTo(-2.0, 10.0);
-    // path.lineTo(2.0, 10.0);
     path.lineTo(5.0, -radius / 1.8);
     path.lineTo(1.5, -radius - 10.0);
     path.close();
 
     canvas.drawPath(path, minuteHandPaint);
-    canvas.drawShadow(path, Colors.black, 4.0, false);
-
+    canvas.drawShadow(path, Colors.white, 4.0, false);
     canvas.restore();
   }
 

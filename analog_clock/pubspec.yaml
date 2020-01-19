@@ -21,3 +21,5 @@ flutter:
 
   assets:
    - images/afternoon.jpg
+   - images/night.jpg
+   - images/rain.gif
