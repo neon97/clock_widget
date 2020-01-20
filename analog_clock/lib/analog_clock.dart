@@ -10,7 +10,6 @@ import 'package:analog_clock/minute_hand.dart';
 import 'package:analog_clock/seconds_dart.dart';
 import 'clock_dial_painter.dart';
 
-
 final radiansPerTick = radians(360 / 60);
 final radiansPerHour = radians(360 / 12);
 
@@ -74,18 +73,90 @@ class _AnalogClockState extends State<AnalogClock> {
   void _updateTime() {
     setState(() {
       _now = DateTime.now();
-      // Update once per second. Make sure to do it at the beginning of each
-      // new second, so that the clock is accurate.
       _timer = Timer(
         Duration(seconds: 1) - Duration(milliseconds: _now.millisecond),
         _updateTime,
       );
+
+      String hour = _now.hour.toString();
+
+      if (hour == "06" ||
+          hour == "07" ||
+          hour == "08" ||
+          hour == "09" ||
+          hour == "10" ||
+          hour == "11") {
+        setState(() {
+          weatherImage = "images/morning.jpg";
+        });
+        weatherGif(_condition);
+      } else if (hour == "11" ||
+          hour == "12" ||
+          hour == "13" ||
+          hour == "14" ||
+          hour == "15" ||
+          hour == "16") {
+        setState(() {
+          weatherImage = "images/afternoon.jpg";
+          ThemeMode.dark;
+        });
+        weatherGif(_condition);
+      } else if (hour == "17" || hour == "18" || hour == "19") {
+        setState(() {
+          weatherImage = "images/evening.jpg";
+        });
+
+        weatherGif(_condition);
+      } else if (hour == "20" ||
+          hour == "21" ||
+          hour == "22" ||
+          hour == "23" ||
+          hour == "01" ||
+          hour == "02" ||
+          hour == "03") {
+        setState(() {
+          weatherImage = "images/night.jpg";
+        });
+        weatherGif(_condition);
+      } else if (hour == "04" || hour == "05") {
+        setState(() {
+          weatherImage = "images/snow.jpeg";
+        });
+        weatherGif(_condition);
+      } else {
+        weatherGif(_condition);
+      }
     });
   }
 
+  //function for chnaging the weather gif
+
+  void weatherGif(String wther) {
+    if (wther == "Snowy") {
+      setState(() {
+        weatherChange = "images/snowing.gif";
+      });
+    } else if (wther == "Thunderstorm") {
+      setState(() {
+        weatherChange = "images/thunder.gif";
+      });
+    } else if (wther == "Rainy") {
+      setState(() {
+        weatherChange = "images/rain.gif";
+      });
+    } else {
+      setState(() {
+        weatherChange = "images/sunny.png";
+      });
+    }
+  }
+
+  String weatherImage = "images/afternoon.jpg";
+  String weatherChange = "images/sunny.jpg";
+
   @override
   Widget build(BuildContext context) {
-    final customTheme = Theme.of(context).brightness == Brightness.dark
+    final customTheme = Theme.of(context).brightness == Brightness.light
         ? Theme.of(context)
             .copyWith(accentColor: Colors.black, backgroundColor: Colors.white)
         : Theme.of(context).copyWith(
@@ -107,8 +178,6 @@ class _AnalogClockState extends State<AnalogClock> {
             _condition,
             style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
           ),
-
-          // Text(_location),
         ],
       ),
     );
@@ -121,10 +190,9 @@ class _AnalogClockState extends State<AnalogClock> {
           Text(
             _location,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic,
-              fontSize: 22.0
-            ),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                fontSize: 22.0),
           ),
         ],
       ),
@@ -137,21 +205,21 @@ class _AnalogClockState extends State<AnalogClock> {
         decoration: BoxDecoration(
             image: DecorationImage(
                 image: AssetImage(
-                    "images/night.jpg"), //can change acc to location and time.
+                    weatherImage), //can change acc to location and time.
                 fit: BoxFit.fill)),
 
 //clock background
 
         child: Stack(
           children: [
-            
 //Weather conditions
 
             Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                image: DecorationImage(image: AssetImage("images/rain.gif")),
+                image: DecorationImage(
+                    image: AssetImage(weatherChange), fit: BoxFit.fill),
               ),
             ),
 
@@ -245,7 +313,6 @@ class _AnalogClockState extends State<AnalogClock> {
                 child: locationInfo,
               ),
             ),
-
           ],
         ),
       ),

@@ -71,7 +71,7 @@ class ClockModel extends ChangeNotifier {
 
   /// Weather condition text for the current weather, for example  'cloudy'.
   WeatherCondition get weatherCondition => _weatherCondition;
-  WeatherCondition _weatherCondition = WeatherCondition.sunny;
+  WeatherCondition _weatherCondition = WeatherCondition.Snowy;
   set weatherCondition(WeatherCondition weatherCondition) {
     if (weatherCondition != _weatherCondition) {
       _weatherCondition = weatherCondition;
@@ -143,13 +143,10 @@ class ClockModel extends ChangeNotifier {
 
 /// Weather condition in English.
 enum WeatherCondition {
-  cloudy,
-  foggy,
-  rainy,
-  snowy,
-  sunny,
-  thunderstorm,
-  windy,
+  Rainy,
+  Snowy,
+  Sunny,
+  Thunderstorm
 }
 
 /// Temperature unit of measurement.
